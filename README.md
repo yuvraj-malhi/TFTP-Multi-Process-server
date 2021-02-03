@@ -46,7 +46,7 @@ Before the actual setup, you need to note down the server computer's IP address 
 To do this, run the command:
 ``` sudo ifconfig ```
 
-![image](https://user-images.githubusercontent.com/76866159/106452335-bb559500-64ad-11eb-82ce-66f3bc8215bb.png)
+![image](https://user-images.githubusercontent.com/76866159/106704965-ffae7580-6612-11eb-882f-fcb0543f951f.png)
 
 As the picture, in my case the IP is ```192.168.1.106``` 
 
@@ -56,29 +56,29 @@ As the picture, in my case the IP is ```192.168.1.106```
 On the machine where you want the server, create a new empty folder and download (or copy-paste) "tftp.c".
         OR
 Simply run the command: 
-``` sudo git clone https://github.com/yuvrajmalhi/TFTP-Single-Process-server.git ```
+``` sudo git clone https://github.com/yuvrajmalhi/TFTP-Multi-Process-server.git ```
 
- ![image](https://user-images.githubusercontent.com/76866159/106451230-433a9f80-64ac-11eb-91c1-6fe57370b7f4.png)
+![image](https://user-images.githubusercontent.com/76866159/106705063-37b5b880-6613-11eb-999f-e8d2a3d3f38d.png)
 
  and then run the command:   
  ``` cd TFTP-Single-Process-server/ ```
  
  Here you may check that two files may have been created.
  
- ![image](https://user-images.githubusercontent.com/76866159/106451291-5c435080-64ac-11eb-8e73-11a165b74bbb.png)
+![image](https://user-images.githubusercontent.com/76866159/106705114-561bb400-6613-11eb-96b5-819297cfcb65.png)
 
 #### STEP III
 Now, copy all the files into the current folder that you may want to transfer to the clients later.
 Use the command:
 
-```cd <file location> ./```
+```cp <file location> ./```
 
 Replace ```<file location>``` with the actual location of the file. 
 
 
 I have copied the debian file "TT.deb"
 
-![image](https://user-images.githubusercontent.com/76866159/106453208-f4423980-64ae-11eb-95e6-5f66aa1bf8b2.png)
+![image](https://user-images.githubusercontent.com/76866159/106705228-94b16e80-6613-11eb-9f66-ee623dab95f8.png)
 
 
 #### STEP IV
@@ -87,20 +87,20 @@ Now, to compile the program, run the command:
  
 A new file "a.out" may have been created.
 
-![image](https://user-images.githubusercontent.com/76866159/106451565-c3f99b80-64ac-11eb-965d-3bc36510a3e5.png)
+![image](https://user-images.githubusercontent.com/76866159/106705290-aeeb4c80-6613-11eb-8a19-c99a7059a92a.png)
 
 #### STEP V
 Now, to run the program, run the command:   
  ``` sudo ./a.out 69```
  
- ![image](https://user-images.githubusercontent.com/76866159/106451873-2b175000-64ad-11eb-9d2a-9383c1646c38.png)
+![image](https://user-images.githubusercontent.com/76866159/106705354-ce827500-6613-11eb-8245-4ab8cc826e20.png)
 
 [Note: if you are a networking geek, you may change the 69 to any other port number, but keep in mind that all TFTP clients connect to port 69 by default]
 
 On the prompt, the program asks if you want to print everything that goes on in the file transfer or just the basics.
 I will recomment choosing no or 'n' as this information will be irrelevant to all other than networking folks.
 
-![image](https://user-images.githubusercontent.com/76866159/106453481-66b31980-64af-11eb-9410-fc6711d99064.png)
+![image](https://user-images.githubusercontent.com/76866159/106705400-e1954500-6613-11eb-8e83-f32d8dd65f8a.png)
 
 Voila! Server is all setup and is listening.
 Now all requests made from the client are shown here, along with the client's IP address, and the filname it has requested.
