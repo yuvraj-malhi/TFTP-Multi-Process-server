@@ -105,8 +105,6 @@ I will recomment choosing no or 'n' as this information will be irrelevant to al
 Voila! Server is all setup and is listening.
 Now all requests made from the client are shown here, along with the client's IP address, and the filname it has requested.
 
-![image](https://user-images.githubusercontent.com/76866159/106455677-85ff7600-64b2-11eb-8741-56ad29a73e30.png)
-
 
 ### Client side
 Client machine can be any machine on the same network (wifi or ethernet or hotspot) as the server. 
@@ -121,12 +119,12 @@ For all others, check if you have a TFTP client. To to this, run the command:
 If an error is shown then you have to install it on your system. So run the command:
 ``` sudo apt install tftp```
 
-![image](https://user-images.githubusercontent.com/76866159/106454080-3fa91780-64b0-11eb-8ced-88f51cdfa583.png)
-
 After installing, run the command:
 ``` sudo tftp```
 
-![image](https://user-images.githubusercontent.com/76866159/106454231-6f581f80-64b0-11eb-918a-864f5c99c5f3.png)
+
+![image](https://user-images.githubusercontent.com/76866159/106705722-7d26b580-6614-11eb-8adb-bf54083e01de.png)
+
 
 #### STEP II
 Connect to ther server using the server's IP that we noted in Step I of Server side Usage
@@ -136,6 +134,9 @@ So to connect to the server IP, run the command:
 ``` connect 192.168.1.106```
 
 Replace 192.168.1.106 with the server IP in you case as it may not be the same.
+
+![image](https://user-images.githubusercontent.com/76866159/106705874-c2e37e00-6614-11eb-9967-d6b9df9e0c79.png)
+
 
 #### STEP III
 Now, we get one of the files that had been stores in the server in Step III of server's usage.
@@ -147,31 +148,31 @@ Replace TT.deb6 with the filename that you had stored.
 #### Wait and watch!
 The transfer will start.
 
-![image](https://user-images.githubusercontent.com/76866159/106455184-dfb37080-64b1-11eb-9991-c4763e5b00a9.png)
+![image](https://user-images.githubusercontent.com/76866159/106706325-882e1580-6615-11eb-9a51-11c4f6250dea.png)
 
 
 As soon as the transfer ends, a prompt is shown telling you the time.
 Morover, on the **Server Side** the speed is also shown.
 
-![image](https://user-images.githubusercontent.com/76866159/106455302-05407a00-64b2-11eb-9092-7ce44c9e4e12.png)
+![image](https://user-images.githubusercontent.com/76866159/106706394-a136c680-6615-11eb-984c-36c3c5bc4ba4.png)
 
 
 ## Demonstration of concurrency
 In this section **3** concurrent processes are made to transfer a file "TT.deb" top 3 clients concurrently.
 
-![image](https://user-images.githubusercontent.com/76866159/106456536-a419a600-64b3-11eb-93e7-9c7c97deffed.png)
+![image](https://user-images.githubusercontent.com/76866159/106706632-fc68b900-6615-11eb-96ba-3d5cb3e2a9da.png)
 
 Together, I am going to press ENTER on all the clients.
 
-![image](https://user-images.githubusercontent.com/76866159/106456674-d75c3500-64b3-11eb-9ee6-14e831237e4c.png)
+![image](https://user-images.githubusercontent.com/76866159/106706715-186c5a80-6616-11eb-93c8-e1719d785e2b.png)
 
-As seen, all three first start and then end one after another. The code works beautifully.
+As seen, all three first start and then end one after another. The code works beautifully. 
 
-### Timeout
-This program also implements timeouts. That is, if a client does not respond in 5 seconds due to inactivity, network issues or anything else, then that client's transfer is closed, thereby saving the servers resources.
 
-_**Important conclusion, in this methodology, the speed performance with multiple clients is BETTER than single client.
-Traditionally as the number of clients double, the speed halves, but here the speed does not go dow; only increases.**_
+_**Important conclusion, in this methodology, the speed is excellent. But as anticipated earlier, the speed reduces to a third as the number of clients triple.
+Hence, this is a good method if there is an upper limit on the number of clients that you have. Else, using a single process server would be better. **_
+
+[Note: Go see my single process server at *https://github.com/yuvrajmalhi/TFTP-Single-Process-server* ]
 
 Do share if you liked my work. Thanks!
 
