@@ -14,22 +14,21 @@
 #include<arpa/inet.h>
 #include<sys/socket.h>
 
-//#include <sys/errno.h>
-//#include <sys/types.h>
-//#include <netinet/in.h>
-//#include <arpa/inet.h>
-//#include <stdint.h>
-
 #include<dirent.h>
-#define directory ".."
+#define directory "."
 
 #define NAME_LEN 100
 #define MODE_LEN 100
 #define DATA_LEN 512
+#define ALARM_TIMEOUT 1
+#define TIMEOUT_ATTEMPTS 5
 
-#define L_PORT 69
+int L_PORT;
+int L_FD;
 #define MSG_LEN 100
 int C_PORT;
+int please_wait;
+int verbose;
 
 typedef struct {
 	unsigned short int opcode;
@@ -42,7 +41,7 @@ typedef struct {
 typedef struct {
 	unsigned short int opcode;
 	unsigned short int block;
-	char data[DATA_LEN];
+	char data[DATA_LEN + 1];
 } Data;
 
 typedef struct {
@@ -56,10 +55,59 @@ typedef struct {
 	char msg[MSG_LEN];	
 } Error;
 
+typedef union {
+	Request rrq;
+	Data data;
+	Ack ack;
+	Error err;
+}Message;
+
+
+long int findSize(char file_name[]) 
+{ 
+	FILE* fp = fopen(file_name, "r"); 
+	if (fp == NULL) 
+        	return -1; 
+	fseek(fp, 0L, SEEK_END); 
+	long int res = ftell(fp); 
+	fclose(fp); 
+	return res; 
+} 
+
+
+
 void datahandler(struct sockaddr_in clientaddress, char* filename, char* mode, int num);
+
+void sig_handler(int sign){
+	please_wait = 0;
+}
+
+int ppid;
+
+void ender(int end)
+{
+	if(getpid()!=ppid)
+	{
+		kill(getppid(),SIGINT);
+		exit(0);
+	}
+	printf("\n\n\n=============================================================\n");
+	printf("                        THANK YOU!\n");
+	printf("=============================================================\n\n");
+	close(L_FD);
+	exit(0);
+}
 
 void main(int argc, char ** argv)
 {
+	printf("\n\n\n=============================================================\n");
+	printf("                          WELCOME!\n");
+	printf("=============================================================\n\n");
+	ppid = getpid();
+	please_wait = 1;
+	signal(SIGALRM, sig_handler);
+	signal(SIGINT, ender);
+
 	struct sockaddr_in localbind, clientaddress;
 //	struct sockaddr_in localbind;
 //	struct sockaddr clientaddress;
@@ -69,26 +117,30 @@ void main(int argc, char ** argv)
 	printf("COMMAND: Initialising server...\n");
 	if(argc<2) 
 	{ 
-		printf("COMMAND: Error: Please enter port number as CLI. Exiting....\n"); 
-		exit(0); 
+		printf("COMMAND: Error: Please enter port number as CLA. Exiting....\n"); 
+		raise(SIGINT);
 	}
 
+	L_PORT = atoi(argv[1]);
 
 	if(argc>2) 
 	{ 
 		printf("COMMAND: Error: Invalid arguements specified. Exiting....\n"); 
-		exit(0); 
+		raise(SIGINT);
 	}
 
 	printf("COMMAND: Dedicating listening port at: \t\t%d\n", L_PORT);
 
 	
-	int L_FD = socket(AF_INET, SOCK_DGRAM, 0);
+	L_FD = socket(AF_INET, SOCK_DGRAM, 0);
 	if(L_FD==-1) 
 	{ 
 		printf("LISTEN: Error initiaising listen port. Exiting....\n"); 
-		exit(0); 
+		raise(SIGINT);
 	}
+	
+	int tttt = 1; 
+	setsockopt(L_FD, SOL_SOCKET, SO_REUSEADDR, &tttt , sizeof(int));
 
 	localbind.sin_family       = AF_INET;
 	localbind.sin_addr.s_addr  = htonl(INADDR_ANY);
@@ -97,12 +149,22 @@ void main(int argc, char ** argv)
 	{ 
 		printf("LISTEN: Error binding listen port. Exiting....\n"); 
 		perror("perror output - ");
-		exit(0); 
+		raise(SIGINT);
 	}
 	
+	char choice[100];
+	printf("COMMAND: Do you want to print the status of each transfer continuously? (Y/N)\n> ");
+	
+	scanf("%[^\n]s",choice); getchar();
+	
+	if((choice[0]=='Y')||(choice[0]=='y'))
+		verbose = 1;
+	else
+		verbose = 0;	
 	
 	printf("COMMAND: Successfully initialised listen port\n");
 
+	printf("\n======================= SERVER START ========================\n\n");
 	char * tmp;
 	int address_len, numbytes;
 	Request * REQUEST;
@@ -176,18 +238,7 @@ int check_file(char* file){
 }
 
 void datahandler(struct sockaddr_in clientaddress, char* filename, char* mode, int num){
-	// send an error packet if you receive request from someone other than the client, with appropriate error code
-	// also return an error packet if you receive duplicate acknowledgement packets
-	
-	// All  packets other than duplicate ACK's and those used for termination are acknowledged unless a timeout occurs
-	
-	// if you receive error packet, then simply terminate!! after printing the message written in the errorMsg from client
-	
-	// if you receive any mode other than octet then also send an error packet to the client, and terminate (for now), although this is a doubt to be asked
-	
-	// terminate immediately after you send the first and only error packet
-	
-	// when you send out the last datagram packet, wait for an ACK, if you don't receive one, then send another ACK, and another till 5 times. After that just timeout. and print, no acknowledgement of last packet received, server terminating time out
+
 
 	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -203,24 +254,122 @@ void datahandler(struct sockaddr_in clientaddress, char* filename, char* mode, i
 		x.ecode = htons(x.ecode);
 		
 		sprintf(x.msg, "No file with name %s found in %s directory\n\0", filename, directory);
-		// check if this string is received correctly or not
-		
-		printf("SERVER #%d: trying to send file not found error packet to client\n", num);
-//		sendto(sockfd, &x, sizeof(x) + sizeof(x.msg) - MSG_LEN, 0, (struct sockaddr_in*)&clientaddress, sizeof(struct sockaddr_in));
-//		sendto(sockfd, &x, sizeof(x), 0, (struct sockaddr_in*)&clientaddress, sizeof(struct sockaddr_in));
+		printf("REQ %d: trying to send file not found error packet to client\n", num);
+		sendto(sockfd, &x, sizeof(x), 0, (struct sockaddr*)&clientaddress, sizeof(struct sockaddr));
 
-		sendto(sockfd, &x, strlen(x.msg)*sizeof(char) + 5, 0, (struct sockaddr*)&clientaddress, sizeof(struct sockaddr));
-		// this can cause a problem
-		printf("SERVER #%d: error packet sent to client successfully\nTERMINATING\n", num);
+		printf("REQ %d: error packet sent to client successfully\nTERMINATING\n", num);
 	}
 	
 	else{
-		//
-		printf("SERVER #%d: not going to send any reply right now\n", num);
+				
+		printf("---------------------- Request %d Start ----------------------\n\n",num,num);
+		struct timeval start_time;
+		gettimeofday(&start_time,NULL);
+		char newfile[NAME_LEN];
+		newfile[0] = '\0';
+		strcat(newfile, directory);
+		strcat(newfile, "/");
+		strcat(newfile, filename);
+		FILE* file = fopen(newfile, "r");
+		
+		int size_msg, fread_return;
+		unsigned short int block = 1;
+		Message x, y;
+		int done = 0, end = 1;
+
+		while(end){
+			fread_return = fread(x.data.data, sizeof(char), DATA_LEN, file);
+			if(fread_return == 0)
+				end = 0;
+				
+			x.data.data[fread_return] = '\0';
+			for(int k = 0; k< TIMEOUT_ATTEMPTS; ++k){
+				// send data
+				done = 0;
+				
+				x.data.opcode = 3;
+				x.data.block = block;
+				x.data.opcode = htons(x.data.opcode);
+				x.data.block = htons(x.data.block);
+				x.data.data[fread_return] = 0;
+				sendto(sockfd, &x, sizeof(Data)-DATA_LEN-2 + fread_return, 0, (struct sockaddr*)&clientaddress, sizeof(struct sockaddr));
+				
+				// wait for reply for timeout duration
+				alarm(ALARM_TIMEOUT);
+				please_wait = 1;
+				
+				if(verbose==1)
+					printf("REQ %d: Sent packet  for block  %d\n", num, block);
+				
+				while(please_wait)
+					if(recvfrom(sockfd, &y, sizeof(Message), MSG_DONTWAIT, (struct sockaddr*)&clientaddress, &size_msg) != -1)
+						break;
+						
+				y.ack.opcode = ntohs(y.ack.opcode);
+				y.ack.block = ntohs(y.ack.block);
+				
+				please_wait = 1;
+
+				if(y.data.opcode == 5)
+					break;
+				
+				else if(y.data.opcode == 4 && y.ack.block == block){
+					if(verbose==1)
+						printf("REQ %d: Received ACK for block  %d\n", num, block);
+					done = 1;
+					break;
+				}
+				
+				if(size_msg > sizeof(Message)){
+					printf("REQ %d: ERROR - Wrong protocol being used by client! Cancelling transfer...\n", num, size_msg);
+					printf("\n====================== Request %d Done =======================\n",num);
+					printf("REQ %d: Transfer for file '%s' failed!\n",num,filename);
+					printf("=============================================================\n\n");
+					y.data.opcode = 6;
+					break;
+				}
+			}
+						
+			if(y.data.opcode == 5){
+				printf("REQ %d: ERROR - Client sending error packet -> %s\n", num,y.err.msg);
+				printf("\n====================== Request %d Done =======================\n",num);
+				printf("REQ %d: Transfer for file '%s' failed!\n",num,filename);
+				printf("=============================================================\n\n");
+				break;
+			}
+			
+			if(done == 0){
+				
+				printf("REQ %d: Received ACK for block  %d\n", num, block);
+				printf("REQ %d: ERROR - Unable to send block  %d ! Cancelling transfer...\n", num, block);
+
+				printf("\n====================== Request %d Done =======================\n",num);
+				printf("REQ %d: Transfer for file '%s' failed!\n",num,filename);
+				printf("=============================================================\n\n");
+
+				break;
+			}
+			
+			++block;
+			done = 0;
+			
+			if(fread_return < DATA_LEN){
+				struct timeval result;
+				gettimeofday(&result,NULL);
+				result.tv_usec -= start_time.tv_usec;
+				result.tv_sec  -= start_time.tv_sec;
+				int sizee = findSize(filename);////////////
+				printf("\n====================== Request %d Done =======================\n",num);
+				printf("REQ %d: File '%s' transferred at speed -> %f Mb/s\n",num,filename,(0.000001*(float)sizee)/((float)(result.tv_sec)+((float)(result.tv_usec)/1000000)));
+				printf("=============================================================\n\n");
+				end = 0;
+			}
+		}
+		
+		fclose(file);
 	}
 	
-	// close sockfd;
-	// terminate the child process
 	close(sockfd);
 	exit(0);
 }
+
