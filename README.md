@@ -170,7 +170,7 @@ As seen, all three first start and then end one after another. The code works be
 
 
 _**Important conclusion, in this methodology, the speed is excellent. But as anticipated earlier, the speed reduces to a third as the number of clients triple.
-Hence, this is a good method if there is an upper limit on the number of clients that you have. Else, using a single process server would be better. **_
+Hence, this is a good method if there is an upper limit on the number of clients that you have. Else, using a single process server would be better.**_
 
 [Note: Go see my single process server at *https://github.com/yuvrajmalhi/TFTP-Single-Process-server* ]
 
