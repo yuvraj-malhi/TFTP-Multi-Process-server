@@ -27,14 +27,13 @@ Keeping this in mind, this TFTP server has the following properties:
 This is a concurrent server because it creates a new process or each new client that wants to interact with the server.
 A multiprocess server would create a new child process or a new thread (in the case for multi-threaded concurrency) for each new client. 
 
-![image](https://user-images.githubusercontent.com/76866159/106448570-f43f3b00-64a8-11eb-9c48-04cb430ed682.png)   
+In the below picture, say if a new "Client C" were to connect, then another server child process (or thread) would be created.
 
-In the above picture, say if a new "Client C" were to connect, then another server child process (or thread) would be created.
+![1](https://user-images.githubusercontent.com/76866159/107152058-e21f3a00-698b-11eb-9cd9-61489dbdca16.png)
 
 Advantage - **Speed**. For upto a limited number of clients (this number depends on your CPU's core specifications), the speed of multi process servers outperforms all.  
 Disadvantage - As the number of child processes (or threads) increase, the server becomes **exponentially slow.**  
 
-![image](https://user-images.githubusercontent.com/76866159/106449420-f6ee6000-64a9-11eb-9cb8-44e45a52c106.png)
 
 
 ## Usage
