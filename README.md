@@ -40,69 +40,34 @@ Disadvantage - As the number of child processes (or threads) increase, the serve
 
 ### Server Side
 
-#### STEP I
-Before the actual setup, you need to note down the server computer's IP address so that it may be used later on. 
-To do this, run the command:
-``` sudo ifconfig ```
+#### STEP I - Note Server IP
+Run  to find the server IP.
 
-![image](https://user-images.githubusercontent.com/76866159/106704965-ffae7580-6612-11eb-882f-fcb0543f951f.png)
-
-As the picture, in my case the IP is ```192.168.1.106``` 
-
-[Note: The typical IP of a machine starts with either 192.... or 172.... or 10....]
-
-#### STEP II
-On the machine where you want the server, create a new empty folder and download (or copy-paste) "tftp.c".
-        OR
-Simply run the command: 
-``` sudo git clone https://github.com/yuvrajmalhi/TFTP-Multi-Process-server.git ```
-
-![image](https://user-images.githubusercontent.com/76866159/106705063-37b5b880-6613-11eb-999f-e8d2a3d3f38d.png)
-
- and then run the command:   
- ``` cd TFTP-Single-Process-server/ ```
- 
- Here you may check that two files may have been created.
- 
-![image](https://user-images.githubusercontent.com/76866159/106705114-561bb400-6613-11eb-96b5-819297cfcb65.png)
-
-#### STEP III
-Now, copy all the files into the current folder that you may want to transfer to the clients later.
-Use the command:
-
-```cp <file location> ./```
-
-Replace ```<file location>``` with the actual location of the file. 
+![image](https://user-images.githubusercontent.com/76866159/134906479-7b241fd5-b8ac-4ae2-91cc-c172ef893668.png)
+As shown, in my case the IP is ```10.0.2.12``` 
 
 
-I have copied the debian file "TT.deb"
+#### STEP II - Initialize server
+Run the following commands to get started: 
 
-![image](https://user-images.githubusercontent.com/76866159/106705228-94b16e80-6613-11eb-9f66-ee623dab95f8.png)
-
-
-#### STEP IV
-Now, to compile the program, run the command:   
- ``` gcc tftp.c ```
- 
-A new file "a.out" may have been created.
-
-![image](https://user-images.githubusercontent.com/76866159/106705290-aeeb4c80-6613-11eb-8a19-c99a7059a92a.png)
-
-#### STEP V
-Now, to run the program, run the command:   
- ``` sudo ./a.out 69```
- 
-![image](https://user-images.githubusercontent.com/76866159/106705354-ce827500-6613-11eb-8245-4ab8cc826e20.png)
+```sudo ifconfig``` - 
+``` sudo git clone https://github.com/yuvrajmalhi/TFTP-Multi-Process-server.git```     
+```cd TFTP-Single-Process-server/```    
+```cp <file location> ./``` 
+```gcc tftp.c -o server```      
+```ls```     
+```sudo ./server 69```        
 
 [Note: if you are a networking geek, you may change the 69 to any other port number, but keep in mind that all TFTP clients connect to port 69 by default]
 
 On the prompt, the program asks if you want to print everything that goes on in the file transfer or just the basics.
 I will recomment choosing no or 'n' as this information will be irrelevant to all other than networking folks.
 
-![image](https://user-images.githubusercontent.com/76866159/106705400-e1954500-6613-11eb-8e83-f32d8dd65f8a.png)
+Here's how:
+![Server_Multiproc](https://user-images.githubusercontent.com/76866159/134904153-60cb5b49-6125-463c-98d4-ba3faf17c838.gif)
 
 Voila! Server is all setup and is listening.
-Now all requests made from the client are shown here, along with the client's IP address, and the filname it has requested.
+
 
 
 ### Client side
