@@ -19,7 +19,7 @@ Keeping this in mind, this TFTP server has the following properties:
   4. __Fast__          - Functions that currently take hundereds of lines have been optimised to do the same task in very few lines.    
   5. __Intuitive__      - Variable & function names are very intuitive so as to eliminate confusion.    
   6. __Optional Verbose__ - The code has an option whether to print all the details of transfer or not.     
-
+  7. __Client Timeout__ - Server disconnects with client if there is no response for 15 seconds.   
 
 ### Concurrency
 This is a multiprocess server that ceates a new child process or a new thread (multi-threaded concurrency) for each new client. For example, In the below picture, say if a new "Client C" were to connect, then another server child process (or thread) would be created.
